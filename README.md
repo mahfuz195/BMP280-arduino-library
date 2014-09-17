@@ -21,6 +21,7 @@ VDDIO ----> VDD
 
 
 Instructions :
+=============
 
 Copy the BMP280 folder to Arduino/libraries
 

@@ -1,5 +1,9 @@
 BMP280 Arduino Library
 ======================
+
+This library uses I2C communication with Arduino and read the Temperature( degC) , Pressure (mBar) and Altitude (m).
+
+
 Pin Connection : 
 ======
 

@@ -1,7 +1,7 @@
 BMP280 Arduino Library
 ======================
 Pin Connection : 
-===============
+======
 
 BMP280-----Arduino
 

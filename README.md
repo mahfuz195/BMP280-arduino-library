@@ -19,7 +19,7 @@ SCL   ----> PIN21 (arduino mega)
 
 SDO   ----> GND   (slave address 0x76)
 
-CS    ----> VDD   (HIGH for I2C)
+CS    ----> GND   (LOW for I2C)
 
 VDDIO ----> VDD
 

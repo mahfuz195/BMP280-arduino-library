@@ -23,12 +23,16 @@
 #include "WProgram.h"
 #endif
 
+// #define _debugSerial
+// #define _debugTestData
+
 class BMP280
 {
 	public:
 		BMP280(); // base type
 
 		char begin();
+		char begin(int sdaPin, int sclPin);
 			// call pressure.begin() to initialize BMP280 before use
 			// returns 1 if success, 0 if failure (i2C connection problem.)
 				
@@ -71,13 +75,19 @@ class BMP280
 
 	private:
 	
-		char readInt(char address, int &value);
+		char readCalibration();
+			// Retrieve calibration data from device:
+			// The BMP280 includes factory calibration data stored on the device.
+			// Each device has different numbers, these must be retrieved and
+			// used in the calculations when taking measurements.
+
+		char readInt(char address, double &value);
 			// read an signed int (16 bits) from a BMP280 register
 			// address: BMP280 register address
 			// value: external signed int for returned value (16 bits)
 			// returns 1 for success, 0 for fail, with result in value
 
-		char readUInt(char address, unsigned int &value);
+		char readUInt(char address, double &value);
 			// read an unsigned int (16 bits) from a BMP280 register
 			// address: BMP280 register address
 			// value: external unsigned int for returned value (16 bits)
@@ -99,10 +109,11 @@ class BMP280
 			//get uncalibrated UP and UT value.
 	
 				
-		int dig_T2 , dig_T3 , dig_T4 , dig_P2 , dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9; 
-		unsigned int dig_P1,dig_T1 ;
+		//int dig_T2 , dig_T3 , dig_T4 , dig_P2 , dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9; 
+		//unsigned int dig_P1 , dig_T1 ;
+		double dig_T1, dig_T2 , dig_T3 , dig_T4 , dig_P1, dig_P2 , dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9; 
 		short oversampling, oversampling_t;
-		long signed int t_fine;
+		double t_fine;
 		char error;
 };
 

@@ -1,0 +1,25 @@
+{
+  "name": "BMP280",
+  "keywords": "i2c, sensor, temperature, pressure, altitude",
+  "description": "Arduino Library for Bosch BMP280",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/mahfuz195/BMP280-Arduino-Library/"
+  },
+  "authors": 
+  [
+    {
+      "name": "mahfuz195",
+      "maintainer": true
+    }
+  ],
+  "dependencies":
+  {
+    "name": "Wire",
+    "frameworks": "arduino"
+  },
+  "version": "1.0.0",
+  "frameworks": "arduino",
+  "platforms": "*"
+}

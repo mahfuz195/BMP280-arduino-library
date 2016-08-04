@@ -1,7 +1,7 @@
 BMP280 Arduino Library
 ======================
 
-This library uses I2C communication with Arduino and read the Temperature( degC) , Pressure (mBar) and Altitude (m).
+This library uses I2C communication with Arduino/ESP8266 and read the Temperature( degC) , Pressure (mBar) and Altitude (m).
 
 
 Pin Connection : 
@@ -13,9 +13,9 @@ VDD   ----> 3.3V
 
 GND   ----> GND
 
-SDA   ----> PIN20 (arduino mega) 
+SDA   ----> PIN20 (arduino mega, changeable in begin) 
 
-SCL   ----> PIN21 (arduino mega)
+SCL   ----> PIN21 (arduino mega, changeable in begin)
 
 SDO   ----> GND   (slave address 0x76)
 

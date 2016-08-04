@@ -28,17 +28,26 @@ BMP280::BMP280()
 /*
 *	Initialize library and coefficient for measurements
 */
+char BMP280::begin(int sdaPin, int sclPin)
+{
+	Wire.begin(sdaPin,sclPin);
+	return (readCalibration());
+}
+
 char BMP280::begin() 
 {
 	
 	// Start up the Arduino's "wire" (I2C) library:
 	Wire.begin();
+	return (readCalibration());
+}
 
-	// The BMP280 includes factory calibration data stored on the device.
-	// Each device has different numbers, these must be retrieved and
-	// used in the calculations when taking measurements.
+// The BMP280 includes factory calibration data stored on the device.
+// Each device has different numbers, these must be retrieved and
+// used in the calculations when taking measurements.
 
-	// Retrieve calibration data from device:
+// Retrieve calibration data from device:
+char BMP280::readCalibration() {
 	
 	if (    
 		readUInt(0x88, dig_T1) &&
@@ -53,20 +62,46 @@ char BMP280::begin()
 		readInt(0x9A, dig_P7)  &&
 		readInt(0x9C, dig_P8)  &&
 		readInt(0x9E, dig_P9)){
-		/*
-		Serial.print("dig_T1="); Serial.println(dig_T1,DEC);
-		Serial.print("dig_T2="); Serial.println(dig_T2,DEC);
-		Serial.print("dig_T3="); Serial.println(dig_T3,DEC);
-		Serial.print("dig_P1="); Serial.println(dig_P1,DEC);
-		Serial.print("dig_P2="); Serial.println(dig_P2,DEC);
-		Serial.print("dig_P3="); Serial.println(dig_P3,DEC);
-		Serial.print("dig_P4="); Serial.println(dig_P4,DEC);
-		Serial.print("dig_P5="); Serial.println(dig_P5,DEC);
-		Serial.print("dig_P6="); Serial.println(dig_P6,DEC);
-		Serial.print("dig_P7="); Serial.println(dig_P7,DEC);
-		Serial.print("dig_P8="); Serial.println(dig_P8,DEC);
-		Serial.print("dig_P9="); Serial.println(dig_P9,DEC);
-		*/
+#ifdef _debugSerial
+		Serial.print("dig_T1="); Serial.println(dig_T1,2);
+		Serial.print("dig_T2="); Serial.println(dig_T2,2);
+		Serial.print("dig_T3="); Serial.println(dig_T3,2);
+		Serial.print("dig_P1="); Serial.println(dig_P1,2);
+		Serial.print("dig_P2="); Serial.println(dig_P2,2);
+		Serial.print("dig_P3="); Serial.println(dig_P3,2);
+		Serial.print("dig_P4="); Serial.println(dig_P4,2);
+		Serial.print("dig_P5="); Serial.println(dig_P5,2);
+		Serial.print("dig_P6="); Serial.println(dig_P6,2);
+		Serial.print("dig_P7="); Serial.println(dig_P7,2);
+		Serial.print("dig_P8="); Serial.println(dig_P8,2);
+		Serial.print("dig_P9="); Serial.println(dig_P9,2);
+#endif
+#ifdef _debugTestData
+		dig_T1 = 27504.0;
+		dig_T2 = 26435.0;
+		dig_T3 = -1000.0;
+		dig_P1 = 36477.0;
+		dig_P2 = -10685.0;
+		dig_P3 = 3024.0;
+		dig_P4 = 2855.0;
+		dig_P5 = 140.0;
+		dig_P6 = -7.0;
+		dig_P7 = 15500.0;
+		dig_P8 = -14600.0;
+		dig_P9 = 6000.0;
+		Serial.print("dig_T1="); Serial.println(dig_T1,2);
+		Serial.print("dig_T2="); Serial.println(dig_T2,2);
+		Serial.print("dig_T3="); Serial.println(dig_T3,2);
+		Serial.print("dig_P1="); Serial.println(dig_P1,2);
+		Serial.print("dig_P2="); Serial.println(dig_P2,2);
+		Serial.print("dig_P3="); Serial.println(dig_P3,2);
+		Serial.print("dig_P4="); Serial.println(dig_P4,2);
+		Serial.print("dig_P5="); Serial.println(dig_P5,2);
+		Serial.print("dig_P6="); Serial.println(dig_P6,2);
+		Serial.print("dig_P7="); Serial.println(dig_P7,2);
+		Serial.print("dig_P8="); Serial.println(dig_P8,2);
+		Serial.print("dig_P9="); Serial.println(dig_P9,2);
+#endif
 		return (1);
 	}
 	else 
@@ -78,7 +113,7 @@ char BMP280::begin()
 **	@param : address = register to start reading (plus subsequent register)
 **	@param : value   = external variable to store data (function modifies value)
 */
-char BMP280::readInt(char address, int &value)
+char BMP280::readInt(char address, double &value)
 
 {
 	unsigned char data[2];	//char is 4bit,1byte
@@ -86,7 +121,7 @@ char BMP280::readInt(char address, int &value)
 	data[0] = address;
 	if (readBytes(data,2))
 	{
-		value = (((int)data[1]<<8)|(int)data[0]);
+		value = (double)(int16_t)(((unsigned int)data[1]<<8)|(unsigned int)data[0]); //
 		return(1);
 	}
 	value = 0;
@@ -98,13 +133,13 @@ char BMP280::readInt(char address, int &value)
 **	@param : value 	 = external variable to store data (function modifies value)
 */
 
-char BMP280::readUInt(char address, unsigned int &value)
+char BMP280::readUInt(char address, double &value)
 {
 	unsigned char data[2];	//4bit
 	data[0] = address;
 	if (readBytes(data,2))
 	{
-		value = (((unsigned int)data[1]<<8)|(unsigned int)data[0]);
+		value = (double)(unsigned int)(((unsigned int)data[1]<<8)|(unsigned int)data[0]);
 		return(1);
 	}
 	value = 0;
@@ -228,9 +263,20 @@ char BMP280::getUnPT(double &uP, double &uT)
 	if (result) // good read
 	{
 		double factor = pow(2, 4);
-		uP = (( (data[0] *256.0) + data[1] + (data[2]/256.0))) * factor ;	//20bit UP
-		uT = (( (data[3] *256.0) + data[4] + (data[5]/256.0))) * factor ;	//20bit UT
-		
+		uP = (double)(data[0] *4096 + data[1]*16 + data[2]/16) ;	//20bit UP
+		uT = (double)(data[3]*4096 + data[4]*16 + data[5]/16) ;	//20bit UT
+#ifdef _debugSerial
+		Serial.print(uT);
+		Serial.print(" ");
+		Serial.println(uP); 
+#endif
+#ifdef _debugTestData
+		uT = 519888.0;
+		uP = 415148.0;
+		Serial.print(uT);
+		Serial.print(" ");
+		Serial.println(uP); 
+#endif
 	}
 	return(result);
 }
@@ -241,7 +287,8 @@ char BMP280::getUnPT(double &uP, double &uT)
 */
 char BMP280::getTemperatureAndPressure(double &T,double &P)
 {
-	double uP,uT ;
+	double uT ;
+	double uP;
 	char result = getUnPT(uP,uT);
 	if(result!=0){
 		// calculate the temperature
@@ -251,33 +298,40 @@ char BMP280::getTemperatureAndPressure(double &T,double &P)
 			result = calcPressure(P,uP);
 			if(result)return (1);
 			else error = 3 ;	// pressure error ;
-			return (0);
+			return (9);
 		}else 
 			error = 2;	// temperature error ;
 	}
 	else 
 		error = 1;
 	
-	return (0);
+	return (9);
 }
 /*
 ** temperature calculation
 ** @param : T  = stores the temperature value after calculation.
 ** @param : uT = the uncalibrated temperature value.
 */
-char BMP280::calcTemperature(double &T, double &uT)
+char BMP280::calcTemperature(double &T, double &adc_T)
 //
 {
-	double adc_T = uT ;
 	//Serial.print("adc_T = "); Serial.println(adc_T,DEC);
 		
-	double var1 = (((double)adc_T)/16384.0-((double)dig_T1)/1024.0)*((double)dig_T2);
-	double var2 = ((((double)adc_T)/131072.0 - ((double)dig_T1)/8192.0)*(((double)adc_T)/131072.0 - ((double)dig_T1)/8192.0))*((double)dig_T3);
-	t_fine = (long signed int)(var1+var2);
-		
+	double var1 = (adc_T/16384.0 - dig_T1/1024.0)*dig_T2;
+	double var2 = ((adc_T/131072.0 - dig_T1/8192.0)*(adc_T/131072.0 - dig_T1/8192.0))*dig_T3;
+	t_fine = var1+var2;
 	T = (var1+var2)/5120.0;
+#ifdef _debugSerial
+	Serial.print(var1);
+	Serial.print(" ");
+	Serial.print(var2);
+	Serial.print(" ");
+	Serial.print(t_fine);
+	Serial.print(" ");
+	Serial.println(T);
+#endif
 	
-	if(T>100.0 || T <-100.0)return 0;
+	if(T>100 || T <-100)return 0;
 	
 	return (1);
 }
@@ -291,47 +345,58 @@ char BMP280::calcPressure(double &P,double uP)
 	//char result;
 	double var1 , var2 ;
 	
-	var1 = ((double)t_fine/2.0) - 64000.0;
-	//Serial.print("var1 = ");Serial.println(var1,2);
-	var2 = var1 * (var1 * ((double)dig_P6)/32768.0);	//not overflow
-	//Serial.print("var2 = ");Serial.println(var2,2);
-	var2 = var2 + (var1 * ((double)dig_P5)*2.0);	//overflow
-	//Serial.print("var2 = ");Serial.println(var2,2);
+	var1 = (t_fine/2.0) - 64000.0;
+#ifdef _debugSerial
+	Serial.print("var1 = ");Serial.println(var1,2);
+#endif
+	var2 = var1 * (var1 * dig_P6/32768.0);	//not overflow
+#ifdef _debugSerial
+	Serial.print("var2 = ");Serial.println(var2,2);
+#endif
+	var2 = var2 + (var1 * dig_P5 * 2.0);	//overflow
+#ifdef _debugSerial
+	Serial.print("var2 = ");Serial.println(var2,2);
+#endif
 		
-	var2 = (var2/4.0)+(((double)dig_P4)*65536.0);
-	//Serial.print("var2 = ");Serial.println(var2,2);
+	var2 = (var2/4.0)+((dig_P4)*65536.0);
+#ifdef _debugSerial
+	Serial.print("var2 = ");Serial.println(var2,2);
+#endif
 		
-	var1 = (((double)dig_P3) * var1 * var1/524288.0 + ((double)dig_P2) * var1) / 524288.0;
-	//Serial.print("var1 = ");Serial.println(var1,2);
+	var1 = (dig_P3 * var1 * var1/524288.0 + dig_P2 * var1) / 524288.0;
+#ifdef _debugSerial
+	Serial.print("var1 = ");Serial.println(var1,2);
+#endif
+	var1 = (1.0 + var1/32768.0) * dig_P1;
+#ifdef _debugSerial
+	Serial.print("var1 = ");Serial.println(var1,2);
+#endif
 		
+	P = 1048576.0- uP;
+#ifdef _debugSerial
+	Serial.print("p = ");Serial.println(p,2);
+#endif
 		
-	//Serial.print("(32768.0 + var1) = ");Serial.println((32768.0 + var1),5);
+	P = (P-(var2/4096.0))*6250.0/var1 ;	//overflow
+#ifdef _debugSerial
+	Serial.print("p = ");Serial.println(p,2);	
+#endif
 		
-	double t_var = (32768.0 + var1)/32768.0;
-	//Serial.print("((32768.0 + var1)/32768.0) = "); Serial.println(t_var,5);
-	//Serial.print("dig_P1 = ");Serial.println(dig_P1);
-	//Serial.print("dig_P1 = ");Serial.println((double)dig_P1,5);
-	double tt_var = t_var * (double)dig_P1;
+	var1 = dig_P9*P*P/2147483648.0;	//overflow
+#ifdef _debugSerial
+	Serial.print("var1 = ");Serial.println(var1,2);
+#endif
+
+	var2 = P*dig_P8/32768.0;
+#ifdef _debugSerial
+	Serial.print("var2 = ");Serial.println(var2,2);
+#endif
+	P = P + (var1+var2+dig_P7)/16.0;
+#ifdef _debugSerial
+	Serial.print("p = ");Serial.println(p,2);
+#endif
 		
-	//Serial.print("mulipication = "); Serial.println(tt_var,5);
-	
-	var1 = ((32768.0 + var1)/32768.0)*((double)dig_P1);
-	//Serial.print("var1 = ");Serial.println(var1,2);
-		
-	double p = 1048576.0- (double)uP;
-	//Serial.print("p = ");Serial.println(p,2);
-		
-	p = (p-(var2/4096.0))*6250.0/var1 ;	//overflow
-	//Serial.print("p = ");Serial.println(p,2);	
-		
-	var1 = ((double)dig_P9)*p*p/2147483648.0;	//overflow
-		
-	var2 = p*((double)dig_P8)/32768.0;
-	//Serial.print("var1 = ");Serial.println(var1,2);
-	p = p + (var1+var2+((double)dig_P7))/16.0;
-	//Serial.print("p = ");Serial.println(p,2);
-		
-	P = p/100.0 ;
+	P = P/100.0 ;
 	
 	if(P>1200.0 || P < 800.0)return (0);
 	return (1);

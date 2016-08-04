@@ -1,0 +1,30 @@
+#######################################
+# Syntax Coloring Map For BMP280
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+BMP280    				KEYWORD1
+OneWire					KEYWORD1
+AlarmHandler			KEYWORD1
+DeviceAddress			KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+getOversampling			KEYWORD2
+setOversampling			KEYWORD2
+startMeasurment				KEYWORD2
+calcTemperature			KEYWORD2
+calcPressure				KEYWORD2
+sealevel 		KEYWORD2
+altitude			KEYWORD2
+getError	KEYWORD2
+getTemperatureAndPressure	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

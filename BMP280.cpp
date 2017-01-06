@@ -235,6 +235,11 @@ char BMP280::startMeasurment(void)
 			oversampling_t = 1;
 			delay = 45;
 		break;
+		case 16:
+			data[1] = BMP280_COMMAND_OVERSAMPLING_MAX;
+			oversampling_t = 1;
+			delay = 80;	//I cannot find any data about timings in datasheet for x16 pressure and x16 temeprature oversampling
+		break;				//I guess this is enough time (maybe it can be even smaller ~60ms)
 		default:
 			data[1] = BMP280_COMMAND_PRESSURE0;
 			delay = 9;

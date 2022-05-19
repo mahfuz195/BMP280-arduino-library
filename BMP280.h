@@ -32,7 +32,6 @@ class BMP280
 		BMP280(); // base type
 
 		char begin();
-		char begin(int sdaPin, int sclPin);
 			// call pressure.begin() to initialize BMP280 before use
 			// returns 1 if success, 0 if failure (i2C connection problem.)
 				

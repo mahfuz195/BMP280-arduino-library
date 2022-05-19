@@ -25,15 +25,10 @@ BMP280::BMP280()
 {
 	//do nothing
 }
+
 /*
 *	Initialize library and coefficient for measurements
 */
-char BMP280::begin(int sdaPin, int sclPin)
-{
-	Wire.begin(sdaPin,sclPin);
-	return (readCalibration());
-}
-
 char BMP280::begin() 
 {
 	

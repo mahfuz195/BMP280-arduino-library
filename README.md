@@ -13,9 +13,9 @@ VDD   ----> 3.3V
 
 GND   ----> GND
 
-SDA   ----> PIN20 (arduino mega, changeable in begin) 
+SDA   ----> PIN20 (arduino mega)
 
-SCL   ----> PIN21 (arduino mega, changeable in begin)
+SCL   ----> PIN21 (arduino mega)
 
 SDO   ----> GND   (slave address 0x76)
 

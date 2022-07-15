@@ -28,15 +28,9 @@ BMP280::BMP280()
 /*
 *	Initialize library and coefficient for measurements
 */
-char BMP280::begin(int sdaPin, int sclPin)
-{
-	Wire.begin(sdaPin,sclPin);
-	return (readCalibration());
-}
-
 char BMP280::begin() 
 {
-	
+
 	// Start up the Arduino's "wire" (I2C) library:
 	Wire.begin();
 	return (readCalibration());
@@ -202,7 +196,6 @@ char BMP280::setOversampling(short oss)
 ** @returns : delay in ms to wait, or 0 if I2C error.
 */
 char BMP280::startMeasurment(void)
-
 {
 	unsigned char data[2], result, delay;
 	
@@ -267,13 +260,12 @@ char BMP280::getUnPT(double &uP, double &uT)
 	result = readBytes(data, 6); // 0xF7; xF8, 0xF9, 0xFA, 0xFB, 0xFC
 	if (result) // good read
 	{
-		double factor = pow(2, 4);
-		uP = (double)(data[0] *4096 + data[1]*16 + data[2]/16) ;	//20bit UP
-		uT = (double)(data[3]*4096 + data[4]*16 + data[5]/16) ;	//20bit UT
+		uP = (double) ((uint32_t) data[0] * 4096 + data[1] * 16 + data[2] / 16.) ;	//20bit UP
+		uT = (double) ((uint32_t) data[3] * 4096 + data[4] * 16 + data[5] / 16.) ;	//20bit UT
 #ifdef _debugSerial
 		Serial.print(uT);
 		Serial.print(" ");
-		Serial.println(uP); 
+		Serial.println(uP);
 #endif
 #ifdef _debugTestData
 		uT = 519888.0;
@@ -379,12 +371,12 @@ char BMP280::calcPressure(double &P,double uP)
 		
 	P = 1048576.0- uP;
 #ifdef _debugSerial
-	Serial.print("p = ");Serial.println(p,2);
+	Serial.print("p = ");Serial.println(P,2);
 #endif
 		
 	P = (P-(var2/4096.0))*6250.0/var1 ;	//overflow
 #ifdef _debugSerial
-	Serial.print("p = ");Serial.println(p,2);	
+	Serial.print("p = ");Serial.println(P,2);
 #endif
 		
 	var1 = dig_P9*P*P/2147483648.0;	//overflow
@@ -398,7 +390,7 @@ char BMP280::calcPressure(double &P,double uP)
 #endif
 	P = P + (var1+var2+dig_P7)/16.0;
 #ifdef _debugSerial
-	Serial.print("p = ");Serial.println(p,2);
+	Serial.print("p = ");Serial.println(P,2);
 #endif
 		
 	P = P/100.0 ;
@@ -438,4 +430,3 @@ char BMP280::getError(void)
 {
 	return(error);
 }
-
